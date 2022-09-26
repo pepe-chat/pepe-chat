@@ -1,5 +1,5 @@
 # PepeChat
-Open-Source Discord Clone
+Open-Source Distributed Chat Server
 
 ## Important Links
 [Websocket Spring boot Tutorial](https://www.devglan.com/spring-boot/spring-websocket-integration-example-without-stomp)
