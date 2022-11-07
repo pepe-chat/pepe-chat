@@ -1,0 +1,60 @@
+openapi: "3.0.3"
+info:
+  version: "1.0.0"
+  title: Pepe Chat
+  description: Open-Source Distributed Chat Server
+paths:
+  /login:
+    post:
+      summary: Log into your account
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDetails"
+      responses:
+        200:
+          description: Logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginSuccess"
+        403:
+          description: Account does not exist or invalid password
+  /register:
+    post:
+      summary: Create a new account
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDetails"
+      responses:
+        201:
+          description: Successfully created account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginSuccess"
+        400:
+          description: Password too insecure
+        409:
+          description: Username already exists
+
+components:
+  schemas:
+    LoginDetails:
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    LoginSuccess:
+      properties:
+        token:
+          type: string
