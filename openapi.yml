@@ -42,6 +42,42 @@ paths:
           description: Password too insecure
         409:
           description: Username already exists
+  /channels:
+    get:
+      description: Get all channels
+      responses:
+        200:
+          description: Successfully retreived channel
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Channel"
+  /users:
+    description: Get users of a server
+    get:
+      responses:
+        200:
+          description: All users on this server
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+
+  /users/me:
+    description: Get Info about myself
+    get:
+      responses:
+        200:
+          description: The user logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        401:
+          $ref: "#/components/responses/401"
 
 components:
   schemas:
@@ -58,3 +94,34 @@ components:
       properties:
         token:
           type: string
+    Channel:
+      required:
+        - name
+        - id
+      properties:
+        name:
+          type: string
+        id:
+          type: string
+    User:
+      properties:
+        username:
+          type: string
+          required: true
+        id:
+          type: string
+          readOnly: true
+          required: true
+        online:
+          type: boolean
+
+  responses:
+    401:
+      description: Unauthorized to access server
+      content:
+        text/plain:
+          schema:
+            enum:
+              - no-token
+              - token-expired
+              - invalid-token
