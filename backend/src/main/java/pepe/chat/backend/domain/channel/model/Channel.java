@@ -11,7 +11,7 @@ import java.util.UUID;
 @Data
 public class Channel {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private UUID channel;
     @OneToMany
     private List<Message> messages;
