@@ -2,14 +2,12 @@ package pepe.chat.backend.domain.auth.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pepe.chat.backend.domain.auth.AuthException;
 import pepe.chat.backend.domain.auth.model.AuthToken;
 import pepe.chat.backend.domain.auth.model.SecretProperties;
 import pepe.chat.backend.domain.auth.model.TokenDTO;
 import pepe.chat.backend.domain.user.model.User;
 import pepe.chat.backend.domain.user.repository.UserRepository;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -22,20 +20,19 @@ public class AuthService {
         this.properties = properties;
     }
 
-    public TokenDTO login(String username, String password) {
+    public TokenDTO login(String username, String password) throws AuthException {
         var opt = repository.findByUsername(username);
-        var user = opt.orElseThrow(() -> new IllegalArgumentException("user " +
-                "does not exist"));
+        var user = opt.orElseThrow(AuthException::noUser);
         if (!user.getPassword().equals(password)) {
-            throw new IllegalArgumentException("password does not match");
+            throw AuthException.noUser();
         }
 
         return new AuthToken(user, false, properties.getSecret()).intoDTO();
     }
 
-    public TokenDTO createUser(String username, String password) {
+    public TokenDTO createUser(String username, String password) throws AuthException {
         if (repository.existsByUsername(username)) {
-            throw new IllegalArgumentException("username already taken");
+            throw AuthException.usernameTaken();
         }
 
         var user = User.builder()
@@ -49,17 +46,13 @@ public class AuthService {
         return new AuthToken(user, false, properties.getSecret()).intoDTO();
     }
 
-    public Optional<AuthToken> getToken(String token) {
+    public User getUserFromToken(String token) throws AuthException {
         try {
-            return Optional.of(new AuthToken(token));
-        } catch (IllegalArgumentException ignored) {
+            var user = repository.findById(new AuthToken(token).getUser());
+
+            return user.orElseThrow(AuthException::noUser);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("invalid-token");
         }
-
-        return Optional.empty();
-    }
-
-    public boolean isValidToken(AuthToken token) {
-        return token.getUntil().isAfter(LocalDateTime.now()) &&
-                repository.existsById(token.getUser());
     }
 }
