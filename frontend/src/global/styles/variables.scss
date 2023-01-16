@@ -1,0 +1,10 @@
+$color-primary: #67974C;
+$color-background: #373836;
+$color-sec-background: #3E403E;
+$color-text: #EFF2F1;
+
+root {
+  background-color: $color-background;
+  color: var($color-text);
+
+}
