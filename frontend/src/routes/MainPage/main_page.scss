@@ -1,0 +1,45 @@
+.app-container {
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  grid-template-areas: "header header header"
+                       "servers rooms chat"
+                       "servers profile chat";
+  grid-template-columns: 7% 13% 80%;
+  grid-template-rows: 5% 90% 5%;
+  color: #EFF2F1;
+
+}
+
+.header {
+  grid-area: header;
+  font-weight: bolder;
+  font-family: "Comic Sans MS", sans-serif;
+  padding: 0.4rem 0 0 1rem;
+  background-color: #373836;
+}
+
+.servers {
+  grid-area: servers;
+  background-color: darken(#373836, 5%);
+}
+
+.profile {
+  grid-area: profile;
+  background-color: #373836;
+}
+
+.icon-container {
+  display: inline-block;
+  margin: 0.3rem 0.5rem 0 0.5rem;
+}
+
+.rooms {
+  background-color: darken(#373836, 2.5%);
+  grid-area: rooms;
+}
+
+.chat {
+  grid-area: chat;
+  background-color: darken(#373836, 5%);
+}

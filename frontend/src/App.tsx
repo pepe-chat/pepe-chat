@@ -1,23 +1,30 @@
 import "./App.scss";
-import SettingsIcon from '@mui/icons-material/Settings';
-import PersonIcon from '@mui/icons-material/Person';
+import axios from 'axios';
+import MainPage from "./routes/MainPage/MainPage";
+import AuthMain from "./routes/auth/AuthMain";
+import {useEffect, useState} from "react";
 
 function App() {
+
+    const [user, setUser] = useState("This is a user");
+
+    useEffect(() => {
+        axios.get(`http://localhost:8080/users/me`)
+            .then(res => {
+                const user = res.data;
+                setUser(user);
+            })
+    });
+
     return (
-        <div className="app-container">
-            <div className="header">PEPE CHAT</div>
-            <div className="servers"></div>
-            <div className="profile">
-                <p className="icon-container">
-                    <SettingsIcon/>
-                </p>
-                <p className="icon-container">
-                    <PersonIcon/>
-                </p>
-            </div>
-            <div className="rooms"></div>
-            <div className="chat"></div>
-        </div>
+        <>
+            {user ?
+                <MainPage/>
+                :
+                <AuthMain/>
+
+            }
+        </>
     );
 }
 
