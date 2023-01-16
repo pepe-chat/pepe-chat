@@ -9,6 +9,9 @@ import pepe.chat.backend.domain.auth.model.TokenDTO;
 import pepe.chat.backend.domain.user.model.User;
 import pepe.chat.backend.domain.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 @Service
 public class AuthService {
     private final UserRepository repository;
@@ -54,5 +57,19 @@ public class AuthService {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("invalid-token");
         }
+    }
+
+    public Optional<AuthToken> getToken(String token) {
+        try {
+            return Optional.of(new AuthToken(token));
+        } catch (AuthException ignored) {
+        }
+
+        return Optional.empty();
+    }
+
+    public boolean isValidToken(AuthToken token) {
+        return token.getUntil().isAfter(LocalDateTime.now()) &&
+                repository.existsById(token.getUser());
     }
 }
