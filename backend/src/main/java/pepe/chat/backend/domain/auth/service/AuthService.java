@@ -2,6 +2,7 @@ package pepe.chat.backend.domain.auth.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pepe.chat.backend.domain.auth.AuthException;
 import pepe.chat.backend.domain.auth.model.AuthToken;
 import pepe.chat.backend.domain.auth.model.SecretProperties;
 import pepe.chat.backend.domain.auth.model.TokenDTO;
@@ -22,20 +23,19 @@ public class AuthService {
         this.properties = properties;
     }
 
-    public TokenDTO login(String username, String password) {
+    public TokenDTO login(String username, String password) throws AuthException {
         var opt = repository.findByUsername(username);
-        var user = opt.orElseThrow(() -> new IllegalArgumentException("user " +
-                "does not exist"));
+        var user = opt.orElseThrow(AuthException::noUser);
         if (!user.getPassword().equals(password)) {
-            throw new IllegalArgumentException("password does not match");
+            throw AuthException.noUser();
         }
 
         return new AuthToken(user, false, properties.getSecret()).intoDTO();
     }
 
-    public TokenDTO createUser(String username, String password) {
+    public TokenDTO createUser(String username, String password) throws AuthException {
         if (repository.existsByUsername(username)) {
-            throw new IllegalArgumentException("username already taken");
+            throw AuthException.usernameTaken();
         }
 
         var user = User.builder()
@@ -49,10 +49,20 @@ public class AuthService {
         return new AuthToken(user, false, properties.getSecret()).intoDTO();
     }
 
+    public User getUserFromToken(String token) throws AuthException {
+        try {
+            var user = repository.findById(new AuthToken(token).getUser());
+
+            return user.orElseThrow(AuthException::noUser);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("invalid-token");
+        }
+    }
+
     public Optional<AuthToken> getToken(String token) {
         try {
             return Optional.of(new AuthToken(token));
-        } catch (IllegalArgumentException ignored) {
+        } catch (AuthException ignored) {
         }
 
         return Optional.empty();

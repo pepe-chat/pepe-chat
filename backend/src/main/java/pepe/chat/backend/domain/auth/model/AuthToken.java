@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.tomcat.util.buf.HexUtils;
+import pepe.chat.backend.domain.auth.AuthException;
 import pepe.chat.backend.domain.user.model.User;
 
 import javax.crypto.BadPaddingException;
@@ -50,7 +51,7 @@ public class AuthToken {
                 this.until.toEpochSecond(ZoneOffset.UTC));
     }
 
-    public AuthToken(String token) {
+    public AuthToken(String token) throws AuthException {
         try {
             var cipher = Cipher.getInstance(ENCODING_ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(secret, KEY_ALGORITHM));
@@ -63,7 +64,13 @@ public class AuthToken {
                         LocalDateTime.ofEpochSecond(Long.parseLong(info[1]),
                                 0, ZoneOffset.UTC);
                 this.isRefresh = info[2].equals("1");
-            } else throw new IllegalArgumentException("Invalid token");
+            } else {
+                throw AuthException.invalidToken();
+            }
+
+            if (this.getUntil().isBefore(LocalDateTime.now())) {
+                throw AuthException.expiredToken();
+            }
         } catch (NoSuchAlgorithmException | InvalidKeyException |
                  IllegalBlockSizeException | NoSuchPaddingException |
                  BadPaddingException e) {

@@ -14,9 +14,8 @@ public class Channel {
     @GeneratedValue
     private UUID channel;
 
-    @Column
+    @Column(unique = true)
     private String name;
-
     @OneToMany
     private List<Message> messages;
 }
