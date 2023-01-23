@@ -3,7 +3,7 @@ import LoginForm from "./LoginForm/LoginForm";
 import RegisterForm from "./RegisterForm/RegisterForm";
 import './auth_main.scss';
 
-export default function AuthMain() {
+export default function AuthMain(handleToken: any) {
     const [login, setLogin] = useState<boolean>(true);
     const [register, setRegister] = useState<boolean>(false);
     return (
@@ -11,7 +11,7 @@ export default function AuthMain() {
             <div className="auth">
                 {login &&
                     <>
-                        <LoginForm/>
+                        <LoginForm handleToken={handleToken}/>
                         Don't have an account yet? <p className="auth_link" onClick={() => {
                         setLogin(false);
                         setRegister(true)
@@ -20,7 +20,7 @@ export default function AuthMain() {
                 }
                 {register &&
                     <>
-                        <RegisterForm/>
+                        <RegisterForm handleToken={handleToken}/>
                         Already have an account? <p className="auth_link" onClick={() => {
                         setLogin(true);
                         setRegister(false)
