@@ -12,7 +12,7 @@ import org.springframework.web.socket.TextMessage;
 @Builder
 @JsonSerialize
 @JsonDeserialize
-public class Message<T> {
+public class WebSocketMessage<T> {
     private String type;
     private T body;
 

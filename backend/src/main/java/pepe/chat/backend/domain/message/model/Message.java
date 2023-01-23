@@ -1,6 +1,9 @@
 package pepe.chat.backend.domain.message.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import pepe.chat.backend.domain.channel.model.Channel;
 import pepe.chat.backend.domain.user.model.User;
@@ -11,6 +14,9 @@ import java.util.UUID;
 
 @Data
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Message {
     @Id
     @GeneratedValue
