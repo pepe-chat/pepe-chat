@@ -81,10 +81,12 @@ public class WebSocketHandler extends TextWebSocketHandler {
                             .map(s -> WebSocketMessage.builder().type(s).build());
                 }
                 case "message" -> {
-                    var content = safeCast(message.getBody(), String.class);
-                    if (content.isEmpty()) {
+                    var content = safeCast(message.getBody(), NewMessage.class);
+                    if (message.getBody() == null) {
                         return Optional.of(WebSocketMessage.builder().type("no-message").build());
-                    }
+                    } else if (content.isEmpty())
+                        return Optional.of(WebSocketMessage.builder().type("faulty-message").build());
+                    userSendsMessage(sessions.get(session.getId()), content.get());
                 }
                 case "create-channel" -> {
 
