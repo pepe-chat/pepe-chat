@@ -19,7 +19,7 @@ public class UserService {
     private UserRepository repository;
 
     public List<UserDTO> getUsers() {
-        return this.repository.getUsers()
+        return this.repository.findAll()
                 .stream()
                 .map(UserDTO::new)
                 .toList();

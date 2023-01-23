@@ -13,6 +13,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import pepe.chat.backend.domain.auth.service.AuthService;
 import pepe.chat.backend.domain.channel.ChannelService;
 import pepe.chat.backend.domain.message.model.Message;
+import pepe.chat.backend.domain.message.model.MessageDTO;
 import pepe.chat.backend.domain.message.repository.MessageRepository;
 import pepe.chat.backend.domain.user.service.UserService;
 import pepe.chat.backend.domain.websocket.model.Session;
@@ -114,12 +115,12 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private void userSendsMessage(Session session, NewMessage message) {
         var user = userService.getUserFromUUID(session.getUser());
         if (user.isEmpty()) {
-            throw new IllegalArgumentException("user does not exist");
+            throw new IllegalArgumentException("user-dne");
         }
 
         var channel = channelService.getChannelByUUID(message.getChannel());
         if (channel.isEmpty()) {
-            throw new IllegalArgumentException("channel does not exist");
+            throw new IllegalArgumentException("channel-dne");
         }
 
         var newMessage = Message.builder()
@@ -127,6 +128,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 .user(user.get())
                 .created(LocalDateTime.now())
                 .channel(channel.get()).build();
+
+        newMessage = messageRepository.save(newMessage);
+        broadcastToUsersExcept(WebSocketMessage.builder().type("new-message").body(MessageDTO.from(newMessage)).build(), user.get().getUuid());
     }
 
     private void broadcastToUsers(WebSocketMessage<?> message) {
@@ -152,7 +156,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     private void broadcastToUsersExcept(WebSocketMessage<?> message,
-                                        UUID userToIgnore) throws JsonProcessingException {
+                                        UUID userToIgnore) {
         sendMessage(message,
                 sessions.values().stream()
                         .filter(val -> !val.getUser().equals(userToIgnore))
